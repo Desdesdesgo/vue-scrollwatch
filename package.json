@@ -1,5 +1,5 @@
 {
-  "name": "vue-scrollwatch-spicy",
+  "name": "vue-scrollwatch",
   "description": "scrollwatch",
   "version": "1.0.0",
   "author": "Desmond_lee",
@@ -12,7 +12,8 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot --config=webpack.config.dev.js",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "build-demo":"cross-env NODE_ENV=production webpack --progress --hide-modules --config=webpack.config.dev.js"
   },
   "dependencies": {
     "bezier-easing": "^2.0.3",
