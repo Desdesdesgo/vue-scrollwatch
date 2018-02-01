@@ -10,8 +10,8 @@
 - 监听元素没有任何限制，无需使用id 或者 class 标记
 - 导航列表没有任何限制
 
-点击查看demo
- <a href="https://desdesdesgo.github.io/vue-scrollwatch/">DEMO</a>
+点击查看[demo](https://desdesdesgo.github.io/vue-scrollwatch/)
+ 
 
 查看源码中的App.vue 获得详细使用方式
 ## Installation
@@ -92,4 +92,13 @@ container and element to be watch hasn't to be father and sons
 滚动容器和监听元素之间不一定是父子关系
 
 
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+### Options
+#### name
+*required:* `true` 
+
+#### offset
+元素位置偏移
+*required:* `true` 
+
+#### callback
+*type:* `function`
