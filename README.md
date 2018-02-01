@@ -42,10 +42,10 @@ nav
 element to watch
 
 ```html
- <div class="section" v-scrollWatch="{name:'b',offset:0,callback:spyDomChange}">scetcion 1</div>
-<div class="section" v-scrollWatch="{name:'c',offset:0,callback:spyDomChange}">scetcion 2</div>
-<div class="section" v-scrollWatch="{name:'d',offset:0,callback:spyDomChange}">scetcion 3</div>
-<div class="section" v-scrollWatch="{name:'e',offset:0,callback:spyDomChange}">scetcion 4</div>
+ <div class="section" v-scrollWatch="{name:'a',offset:0,callback:spyDomChange}">scetcion 1</div>
+<div class="section" v-scrollWatch="{name:'b',offset:0,callback:spyDomChange}">scetcion 2</div>
+<div class="section" v-scrollWatch="{name:'c',offset:0,callback:spyDomChange}">scetcion 3</div>
+<div class="section" v-scrollWatch="{name:'d',offset:0,callback:spyDomChange}">scetcion 4</div>
 
 ```
 
@@ -74,10 +74,10 @@ if you want to define a container to scroll (not window)
 
 ```html
 <div id="#scrollDom">
-    <div class="section" v-scrollWatch="{name:'b',offset:0,callback:spyDomChange}">scetcion 1</div>
-    <div class="section" v-scrollWatch="{name:'c',offset:0,callback:spyDomChange}">scetcion 2</div>
-    <div class="section" v-scrollWatch="{name:'d',offset:0,callback:spyDomChange}">scetcion 3</div>
-    <div class="section" v-scrollWatch="{name:'e',offset:0,callback:spyDomChange}">scetcion 4</div>
+    <div class="section" v-scrollWatch="{name:'a',offset:0,callback:spyDomChange}">scetcion 1</div>
+    <div class="section" v-scrollWatch="{name:'b',offset:0,callback:spyDomChange}">scetcion 2</div>
+    <div class="section" v-scrollWatch="{name:'c',offset:0,callback:spyDomChange}">scetcion 3</div>
+    <div class="section" v-scrollWatch="{name:'d',offset:0,callback:spyDomChange}">scetcion 4</div>
 <div>
 ```
 
@@ -92,13 +92,13 @@ container and element to be watch hasn't to be father and sons
 滚动容器和监听元素之间不一定是父子关系
 
 
-### Options
+## Options
 #### name
 *required:* `true` 
 
 #### offset
 元素位置偏移
 *required:* `true` 
-
+ 
 #### callback
 *type:* `function`
