@@ -94,10 +94,15 @@ vueScrollwatch.install = function (Vue) {
 
             if (container) scrollDom = document.querySelector(container);
             let containerDom = container ? scrollDom : window;
+            if(!containerDom){
+                console.error(`[vue-scrollwatch] Element '${container}' was not found. `);
+                return;
+            }
+            
             if (nodeList.length == 0) {
                 containerDom.addEventListener('scroll', handleScroll);
             }
-            let { name, offset, callback } = binding.value;
+            let { name, offset=0, callback } = binding.value;
 
             nodeList.push({ name, offset, top: el.offsetTop - offset, el, callback })
             nodeList.sort((a, b) => a.top - b.top)
@@ -109,9 +114,11 @@ vueScrollwatch.install = function (Vue) {
 
             nodeList = nodeList.filter(node => node.name != binding.value.name);
             if (nodeList.length == 0 && scrollDom) {
+                
                 containerDom.removeEventListener('scroll', handleScroll);
+                console.dir(containerDom);
             }
-
+            
             // 如果正在动画，则停止
             cancelAnimationFrame(scrollAnimationFrame)
 

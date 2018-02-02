@@ -6,18 +6,19 @@
   "license": "MIT",
   "private": false,
   "main": "dist/vue-scrollwatch.js",
-  "repository": { 
+  "repository": {
     "type": "git",
     "url": "https://github.com/Desdesdesgo/vue-scrollwatch.git"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot --config=webpack.config.dev.js",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "build-demo":"cross-env NODE_ENV=production webpack --progress --hide-modules --config=webpack.config.dev.js"
+    "build-demo": "cross-env NODE_ENV=production webpack --progress --hide-modules --config=webpack.config.dev.js"
   },
   "dependencies": {
     "bezier-easing": "^2.0.3",
-    "vue": "^2.5.11"
+    "vue": "^2.5.11",
+    "vue-router": "^3.0.1"
   },
   "browserslist": [
     "> 1%",
