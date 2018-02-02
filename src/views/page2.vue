@@ -2,6 +2,7 @@
     <div>
 
         <ul class="nav-center">
+            <button @click="$router.push('/')"><b> scroll in a container</b> </button>
             <li>
                 <a :class="{active:activeMenu == 'a'}" @click="scrollTo('a')">Section 1</a>
             </li>
@@ -16,7 +17,7 @@
             </li>
         </ul>
 
-        <div class="main">
+        <div class="main" key='2'>
             <div class="section section-a" v-scrollWatch="{name:'a',offset:0,callback:spyDomChange}"><h1>section 1</h1></div>
             <div class="section  section-b" v-scrollWatch="{name:'b',callback:spyDomChange}"><h1>section 2</h1></div>
             <div class="section  section-c" v-scrollWatch="{name:'c',offset:100,callback:spyDomChange}">
@@ -55,16 +56,19 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 .nav-center {
     
     position: fixed;
-    top: 50px;
+    top: 0px;
     z-index: 999;
     
 }
+h1{
+    margin:0;
+}
 .main{
-    margin-top:50px;
+    margin-top:0px;
     padding-left:200px;
     background: rgba(0,0,0,0.1);
    /*  height:800px;

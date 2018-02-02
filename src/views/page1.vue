@@ -2,6 +2,7 @@
     <div>
 
         <ul class="nav-center">
+            <button @click="$router.push('/page2')"> <b >scroll in window</b> </button>
             <li>
                 <a :class="{active:activeMenu == 'a'}" @click="scrollTo('a')">Section 1</a>
             </li>
@@ -16,10 +17,10 @@
             </li>
         </ul>
 
-        <div class="main" id="scrollDom">
+        <div class="main" id="scrollDom" key='1'>
             <div class="section section-a" v-scrollWatch="{name:'a',offset:0,callback:spyDomChange}"><h1>section 1</h1></div>
             <div class="section  section-b" v-scrollWatch="{name:'b',offset:0,callback:spyDomChange}"><h1>section 2</h1></div>
-            <div class="section  section-c" v-scrollWatch="{name:'c',offset:100,callback:spyDomChange}"><h1>section 3</h1></div>
+            <div class="section  section-c" v-scrollWatch="{name:'c',offset:0,callback:spyDomChange}"><h1>section 3</h1></div>
             <div class="section  section-d" v-scrollWatch="{name:'d',offset:0,callback:spyDomChange}"><h1>section 4</h1></div>
         </div>
     </div>
@@ -51,13 +52,16 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 .nav-center {
     
     position: fixed;
     top: 50px;
     z-index: 999;
     
+}
+h1{
+    margin:0;
 }
 .main{
     margin-top:50px;

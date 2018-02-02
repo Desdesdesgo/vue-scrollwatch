@@ -114,9 +114,9 @@ vueScrollwatch.install = function (Vue) {
 
             nodeList = nodeList.filter(node => node.name != binding.value.name);
             if (nodeList.length == 0 && scrollDom) {
-                
+
                 containerDom.removeEventListener('scroll', handleScroll);
-                console.dir(containerDom);
+                container = '';
             }
             
             // 如果正在动画，则停止
