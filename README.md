@@ -83,7 +83,14 @@ if you want to define a container to scroll (not window)
 
 
 ```js 
-scrollWatch.setContainer("#scrollDom")
+import scrollWatch from "vue-scrollwatch"
+export default {
+    ...
+    created(){
+        scrollWatch.setContainer("#scrollDom")
+    }
+    ...
+}
 ```
 you also can use class as selector
 你也可以使用 class 来作为css 选择器
@@ -98,7 +105,10 @@ container and element to be watch hasn't to be father and sons
 
 #### offset
 元素位置偏移
-*required:* `true` 
+*default:* `0`
  
 #### callback
 *type:* `function`
+
+## Thanks
+[vue-scrollactive](https://github.com/eddiemf/vue-scrollactive.git)
