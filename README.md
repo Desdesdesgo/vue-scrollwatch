@@ -12,8 +12,8 @@
 
 点击查看[demo](https://Desdesdesgo.github.io/vue-scrollwatch/)
  
-
-查看源码中的App.vue 获得详细使用方式
+##### learning usage from src/views/page1.vue and page2.vue
+##### 查看源码中的src/views/page1.vue and page2.vue 获得详细使用方式
 ## Installation
 
 ```bash
@@ -27,8 +27,8 @@ Vue.use(vueScrollwatch)
 ```
 
 ## Usage
-> 导航 
-> nav
+##### 导航 
+##### nav
 ```html
 <ul>
     <li @click="scrollTo('a')">section 1</li>
@@ -69,8 +69,8 @@ export default {
 ```
 
 
-> if you want to define a container to scroll (not window)
-> 如果你想指定滚动容器，而不是window 
+##### if you want to define a container to scroll (not window)
+##### 如果你想指定滚动容器，而不是window 
 
 ```html
 <div id="#scrollDom">
@@ -92,11 +92,11 @@ export default {
     ...
 }
 ```
-> you also can use class as selector
-> 你也可以使用 class 来作为css 选择器
+##### you also can use class as selector
+##### 你也可以使用 class 来作为css 选择器
 
-> container and element to be watch hasn't to be father and sons,it also can be grandfather or grand-grandfather
-> 滚动容器和监听元素之间不一定是父子关系,可以是爷孙关系，也可以是祖宗孙子关系
+##### container and element to be watch hasn't to be father and sons,it also can be grandfather or grand-grandfather
+##### 滚动容器和监听元素之间不一定是父子关系,可以是爷孙关系，也可以是祖宗孙子关系
 
 
 ## Options
