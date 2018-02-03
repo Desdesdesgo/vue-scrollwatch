@@ -10,7 +10,7 @@
 - 监听元素没有任何限制，无需使用id 或者 class 标记
 - 导航列表没有任何限制
 
-点击查看[demo](https://desdesdesgo.github.io/vue-scrollwatch/)
+点击查看[demo](https://Desdesdesgo.github.io/vue-scrollwatch/)
  
 
 查看源码中的App.vue 获得详细使用方式
@@ -27,8 +27,8 @@ Vue.use(vueScrollwatch)
 ```
 
 ## Usage
-导航 
-nav
+> 导航 
+> nav
 ```html
 <ul>
     <li @click="scrollTo('a')">section 1</li>
@@ -69,8 +69,8 @@ export default {
 ```
 
 
-if you want to define a container to scroll (not window)
-如果你想指定滚动容器，而不是window 
+> if you want to define a container to scroll (not window)
+> 如果你想指定滚动容器，而不是window 
 
 ```html
 <div id="#scrollDom">
@@ -92,11 +92,11 @@ export default {
     ...
 }
 ```
-you also can use class as selector
-你也可以使用 class 来作为css 选择器
+> you also can use class as selector
+> 你也可以使用 class 来作为css 选择器
 
-container and element to be watch hasn't to be father and sons
-滚动容器和监听元素之间不一定是父子关系
+> container and element to be watch hasn't to be father and sons
+> 滚动容器和监听元素之间不一定是父子关系
 
 
 ## Options
@@ -110,5 +110,11 @@ container and element to be watch hasn't to be father and sons
 #### callback
 *type:* `function`
 
+## dev example
+``` js
+ npm run dev
+```
+
 ## Thanks
 [vue-scrollactive](https://github.com/eddiemf/vue-scrollactive.git)
+
