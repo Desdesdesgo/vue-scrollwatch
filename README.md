@@ -95,8 +95,8 @@ export default {
 > you also can use class as selector
 > 你也可以使用 class 来作为css 选择器
 
-> container and element to be watch hasn't to be father and sons
-> 滚动容器和监听元素之间不一定是父子关系
+> container and element to be watch hasn't to be father and sons,it also can be grandfather or grand-grandfather
+> 滚动容器和监听元素之间不一定是父子关系,可以是爷孙关系，也可以是祖宗孙子关系
 
 
 ## Options
