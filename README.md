@@ -79,7 +79,7 @@ export default {
  如果你想指定滚动容器，而不是window 
 
 ```html
-<div id="#scrollDom">
+<div id="scrollDom">
     <div class="section" v-scrollWatch="{name:'a',offset:0,callback:spyDomChange}">scetcion 1</div>
     <div class="section" v-scrollWatch="{name:'b',offset:0,callback:spyDomChange}">scetcion 2</div>
     <div class="section" v-scrollWatch="{name:'c',offset:0,callback:spyDomChange}">scetcion 3</div>
