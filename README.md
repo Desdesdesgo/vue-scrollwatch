@@ -15,7 +15,7 @@ features：
 - 滚动容器自由指定，不局限于window
 - vue 指令的方式
 - 导航列表没有任何限制
-- 导航栏和滚动内容可分成两个组件，用vuex进行状态传递
+- 导航栏和滚动内容可分成两个组件，用vuex进行组件间状态传递
 
 
 [click to demo](https://Desdesdesgo.github.io/vue-scrollwatch/)
