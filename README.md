@@ -7,6 +7,7 @@ features：
 - you can set scroll container ,not just window
 - use vue directive
 - no limitation of nav list
+- navigation and content can be divided into two components, state transfer with vuex
 
 特性：
 - 滚动时判断出窗口中当前元素
@@ -14,12 +15,13 @@ features：
 - 滚动容器自由指定，不局限于window
 - vue 指令的方式
 - 导航列表没有任何限制
+- 导航栏和滚动内容可分成两个组件，用vuex进行组件间状态传递
 
 
 [click to demo](https://Desdesdesgo.github.io/vue-scrollwatch/)
  
- learning usage from src/views/page1.vue and page2.vue  
- 查看源码中的src/views/page1.vue and page2.vue 获得详细使用方式
+ learning usage from src/views/page1.vue 、 page2.vue and page3.vue 
+ 查看源码中的src/views/page1.vue 、 page2.vue 和 page3.vue 获得详细使用方式
 ## Installation
 
 ```bash
