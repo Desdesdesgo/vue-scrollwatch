@@ -2,7 +2,7 @@
     <div>
 
         <ul class="nav-center">
-            <button @click="$router.push('/')"><b> scroll in a container</b> </button>
+            <button @click="$router.push('/page3')"><b> scroll in head and body</b> </button>
             <li>
                 <a :class="{active:activeMenu == 'a'}" @click="scrollTo('a')">Section 1</a>
             </li>
