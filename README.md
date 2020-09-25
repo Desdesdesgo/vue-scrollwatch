@@ -74,6 +74,12 @@ export default {
 
 ```
 
+You can also use `scrollTo` as a promise:
+```
+  this.$root.vueScrollwatch.scrollTo(name)
+    .then(success_function(node))
+    .catch(report_unknown_name(name))
+```
 
  if you want to define a container to scroll (not window)  
  如果你想指定滚动容器，而不是window 
