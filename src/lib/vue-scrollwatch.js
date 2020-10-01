@@ -3,28 +3,28 @@ import bezierEasing from 'bezier-easing'
 
 //   滚动监听组件
 
-let nodeList = []
-let scrollDom = document.querySelector("html")
-let container = ''
+let nodeList = {}
+let scrollDom = document.scrollingElement
 let cubicBezierArray = [0.5, 0, 0.35, 1]
 let duration = 600
 let scrollAnimationFrame = null
+
 const handleScroll = function () {
-    let scrollTop = getScrollTop(scrollDom)
+    let scrollTop = scrollDom.scrollTop
     let result = null
+    let nodeTops = {}
+    for (let name in nodeList) {
+      nodeTops[nodeList[name].top] = nodeList[name].name
+    }
+    let tops = Object.keys(nodeTops).sort((a, b) => a - b)
 
-    nodeList.forEach((item) => {
-        if (getOppositeOffsetToContainer(item.el) - item.offset <= scrollTop) {
-            result = item
-        }
-    })
+    for (let top of tops) {
+      let item = nodeList[nodeTops[top]]
+      if (getOppositeOffsetToContainer(item.el) - item.offset <= scrollTop) {
+        result = item
+      }
+    }
     dealResult(result)
-}
-
-const getScrollTop=function(el){
-    if(container) return el.scrollTop
-    let scrollTop = document.documentElement.scrollTop == 0 ? document.body.scrollTop : document.documentElement.scrollTop
-    return scrollTop
 }
 
 const getOppositeOffsetToContainer = function (el) {
@@ -49,25 +49,24 @@ const dealResult = function (result) {
 
 const scrollTo = function (name) {
   let promise = new Promise(function (resolve, reject) {
-    // target node
-    let node = nodeList.find(v => v.name == name)
-    if (!node) {reject(name)}
-    const startingY = getScrollTop(scrollDom)
-    const difference = getOppositeOffsetToContainer(node.el) - startingY
+    let target_node = nodeList[name]
+    if (!target_node) {reject(name)}
+    const startingY = scrollDom.scrollTop
+    const difference = getOppositeOffsetToContainer(target_node.el) - startingY
     const easing = bezierEasing(...cubicBezierArray)
     let start = null
     const step = (timestamp) => {
         if (!start) start = timestamp
         let progress = timestamp - start >= duration ? duration : (timestamp - start)
         let progressPercentage = progress / duration
-        const perTick = startingY + (easing(progressPercentage) * (difference - node.offset))
+        const perTick = startingY + (easing(progressPercentage) * (difference - target_node.offset))
 
         moveTo(perTick)
 
         if (progress < duration) {
-            scrollAnimationFrame = window.requestAnimationFrame(step)
+          scrollAnimationFrame = window.requestAnimationFrame(step)
         } else {
-          resolve(node)
+          resolve(target_node)
         }
     }
     window.requestAnimationFrame(step)
@@ -75,56 +74,49 @@ const scrollTo = function (name) {
   return promise
 }
 
-const moveTo=function(scrollTop){
-    if(container){
-        if(scrollDom.scrollTo){
-            scrollDom.scrollTo(0, scrollTop)
-        }else{
-            scrollDom.scrollTop = scrollTop
-        }
-        return
-    }
-    document.documentElement.scrollTop = scrollTop
-    document.body.scrollTop= scrollTop
+const moveTo = function(scrollTop){
+    scrollDom.scrollTop = scrollTop
 }
 
-const setContainer = function (dom) {
-    container = dom
+const setContainer = function (css_selector) {
+  scrollDom = document.querySelector(css_selector)
+  if(!scrollDom){
+    throw `[vue-scrollwatch] Element '${css_selector}' was not found.`
+  }
+}
+
+const updateNodeList = function(el, binding, vnode) {
+  if (Object.keys(nodeList).length == 0) {
+      scrollDom.addEventListener('scroll', handleScroll)
+  }
+  let { name, offset=0, callback } = binding.value
+  el.attributes.name = name
+
+  let top = el.offsetTop - offset
+  nodeList[name] = { name, offset, top: top, el, callback }
 }
 
 let vueScrollwatch={}
 vueScrollwatch.install = function (Vue) {
     Vue.directive('scrollWatch', {
         inserted: function (el, binding, vnode) {
-            if (container) scrollDom = document.querySelector(container)
-            let containerDom = container ? scrollDom : window
-            if(!containerDom){
-                console.error(`[vue-scrollwatch] Element '${container}' was not found. `)
-                return
-            }
-
-            if (nodeList.length == 0) {
-                containerDom.addEventListener('scroll', handleScroll)
-            }
-            let { name, offset=0, callback } = binding.value
-
-            nodeList.push({ name, offset, top: el.offsetTop - offset, el, callback })
-            nodeList.sort((a, b) => a.top - b.top)
+          updateNodeList(el, binding, vnode)
         },
 
         unbind: function (el, binding, vnode) {
-            let containerDom = container ? scrollDom : window
+          delete nodeList[binding.value.name]
+          if (Object.keys(nodeList).length == 0 && scrollDom) {
+              scrollDom.removeEventListener('scroll', handleScroll)
+              scrollDom = document.scrollingElement
+          }
 
-            nodeList = nodeList.filter(node => node.name != binding.value.name)
-            if (nodeList.length == 0 && scrollDom) {
+          // 如果正在动画，则停止
+          cancelAnimationFrame(scrollAnimationFrame)
+        },
 
-                containerDom.removeEventListener('scroll', handleScroll)
-                container = ''
-            }
-
-            // 如果正在动画，则停止
-            cancelAnimationFrame(scrollAnimationFrame)
-        }
+        update: function (el, binding, vnode) {
+          updateNodeList(el, binding, vnode)
+        },
     })
 }
 
