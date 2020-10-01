@@ -1,30 +1,30 @@
 
-import bezierEasing from 'bezier-easing';
+import bezierEasing from 'bezier-easing'
 
 //   滚动监听组件
 
-let nodeList = [];
-let scrollDom = document.querySelector("html");
-let container = '';
-let cubicBezierArray = [0.5, 0, 0.35, 1];
-let duration = 600;
-let scrollAnimationFrame = null;
+let nodeList = []
+let scrollDom = document.querySelector("html")
+let container = ''
+let cubicBezierArray = [0.5, 0, 0.35, 1]
+let duration = 600
+let scrollAnimationFrame = null
 const handleScroll = function () {
-    let scrollTop = getScrollTop(scrollDom);
-    let result = null;
+    let scrollTop = getScrollTop(scrollDom)
+    let result = null
 
     nodeList.forEach((item) => {
         if (getOppositeOffsetToContainer(item.el) - item.offset <= scrollTop) {
-            result = item;
+            result = item
         }
-    });
-    dealResult(result);
+    })
+    dealResult(result)
 }
 
 const getScrollTop=function(el){
-    if(container) return el.scrollTop;
-    let scrollTop = document.documentElement.scrollTop == 0 ? document.body.scrollTop : document.documentElement.scrollTop; 
-    return scrollTop;
+    if(container) return el.scrollTop
+    let scrollTop = document.documentElement.scrollTop == 0 ? document.body.scrollTop : document.documentElement.scrollTop
+    return scrollTop
 }
 
 const getOppositeOffsetToContainer = function (el) {
@@ -32,19 +32,19 @@ const getOppositeOffsetToContainer = function (el) {
 }
 
 const getOffsetTopByEl = function (element) {
-    let yPosition = 0;
-    let nextElement = element;
+    let yPosition = 0
+    let nextElement = element
 
     while (nextElement) {
-        yPosition += (nextElement.offsetTop);
-        nextElement = nextElement.offsetParent;
+        yPosition += (nextElement.offsetTop)
+        nextElement = nextElement.offsetParent
     }
-    return yPosition;
+    return yPosition
 }
 
 const dealResult = function (result) {
     if (result && result.callback)
-        result.callback(result);
+        result.callback(result)
 }
 
 const scrollTo = function (name) {
@@ -58,7 +58,7 @@ const scrollTo = function (name) {
     let start = null
     const step = (timestamp) => {
         if (!start) start = timestamp
-        let progress = timestamp - start >= duration ? duration : (timestamp - start);
+        let progress = timestamp - start >= duration ? duration : (timestamp - start)
         let progressPercentage = progress / duration
         const perTick = startingY + (easing(progressPercentage) * (difference - node.offset))
 
@@ -69,7 +69,7 @@ const scrollTo = function (name) {
         } else {
           resolve(node)
         }
-    };
+    }
     window.requestAnimationFrame(step)
   })
   return promise
@@ -78,48 +78,48 @@ const scrollTo = function (name) {
 const moveTo=function(scrollTop){
     if(container){
         if(scrollDom.scrollTo){
-            scrollDom.scrollTo(0, scrollTop);
+            scrollDom.scrollTo(0, scrollTop)
         }else{
-            scrollDom.scrollTop = scrollTop;
+            scrollDom.scrollTop = scrollTop
         }
-        return;
+        return
     }
-    document.documentElement.scrollTop = scrollTop;
-    document.body.scrollTop= scrollTop;
+    document.documentElement.scrollTop = scrollTop
+    document.body.scrollTop= scrollTop
 }
 
 const setContainer = function (dom) {
-    container = dom;
+    container = dom
 }
 
 let vueScrollwatch={}
 vueScrollwatch.install = function (Vue) {
     Vue.directive('scrollWatch', {
         inserted: function (el, binding, vnode) {
-            if (container) scrollDom = document.querySelector(container);
-            let containerDom = container ? scrollDom : window;
+            if (container) scrollDom = document.querySelector(container)
+            let containerDom = container ? scrollDom : window
             if(!containerDom){
-                console.error(`[vue-scrollwatch] Element '${container}' was not found. `);
-                return;
+                console.error(`[vue-scrollwatch] Element '${container}' was not found. `)
+                return
             }
 
             if (nodeList.length == 0) {
-                containerDom.addEventListener('scroll', handleScroll);
+                containerDom.addEventListener('scroll', handleScroll)
             }
-            let { name, offset=0, callback } = binding.value;
+            let { name, offset=0, callback } = binding.value
 
             nodeList.push({ name, offset, top: el.offsetTop - offset, el, callback })
             nodeList.sort((a, b) => a.top - b.top)
         },
 
         unbind: function (el, binding, vnode) {
-            let containerDom = container ? scrollDom : window;
+            let containerDom = container ? scrollDom : window
 
-            nodeList = nodeList.filter(node => node.name != binding.value.name);
+            nodeList = nodeList.filter(node => node.name != binding.value.name)
             if (nodeList.length == 0 && scrollDom) {
 
-                containerDom.removeEventListener('scroll', handleScroll);
-                container = '';
+                containerDom.removeEventListener('scroll', handleScroll)
+                container = ''
             }
 
             // 如果正在动画，则停止
@@ -128,6 +128,6 @@ vueScrollwatch.install = function (Vue) {
     })
 }
 
-vueScrollwatch.scrollTo=scrollTo;
-vueScrollwatch.setContainer=setContainer;
+vueScrollwatch.scrollTo=scrollTo
+vueScrollwatch.setContainer=setContainer
 export default vueScrollwatch
