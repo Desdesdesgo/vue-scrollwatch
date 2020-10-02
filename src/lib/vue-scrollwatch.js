@@ -4,6 +4,7 @@ import bezierEasing from 'bezier-easing'
 //   滚动监听组件
 
 let nodeList = {}
+let nodeTops = {}
 let scrollDom = document.scrollingElement
 let cubicBezierArray = [0.5, 0, 0.35, 1]
 let duration = 600
@@ -12,9 +13,11 @@ let scrollAnimationFrame = null
 const handleScroll = function () {
     let scrollTop = scrollDom.scrollTop
     let result = null
-    let nodeTops = {}
-    for (let name in nodeList) {
-      nodeTops[nodeList[name].top] = nodeList[name].name
+    if (Object.keys(nodeList).length != Object.keys(nodeTops).length) {
+      nodeTops = {}
+      for (let name in nodeList) {
+        nodeTops[nodeList[name].top] = nodeList[name].name
+      }
     }
     let tops = Object.keys(nodeTops).sort((a, b) => a - b)
 
@@ -93,7 +96,11 @@ const updateNodeList = function(el, binding, vnode) {
   el.attributes.name = name
 
   let top = el.offsetTop - offset
+  if (name in nodeList) {
+    delete nodeTops[nodeList[name].top]
+  }
   nodeList[name] = { name, offset, top: top, el, callback }
+  nodeTops[top] = name
 }
 
 let vueScrollwatch={}
@@ -104,6 +111,7 @@ vueScrollwatch.install = function (Vue) {
         },
 
         unbind: function (el, binding, vnode) {
+          delete nodeTops[nodeList[binding.value.name].top]
           delete nodeList[binding.value.name]
           if (Object.keys(nodeList).length == 0 && scrollDom) {
               scrollDom.removeEventListener('scroll', handleScroll)
