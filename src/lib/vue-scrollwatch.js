@@ -5,6 +5,7 @@ import bezierEasing from 'bezier-easing'
 
 let nodeList = {}
 let nodeTops = {}
+let currentNode = {}
 let scrollDom = document.scrollingElement
 let cubicBezierArray = [0.5, 0, 0.35, 1]
 let duration = 600
@@ -22,10 +23,15 @@ const handleScroll = function () {
     let tops = Object.keys(nodeTops).sort((a, b) => a - b)
 
     for (let top of tops) {
-      let item = nodeList[nodeTops[top]]
-      if (getOppositeOffsetToContainer(item.el) - item.offset <= scrollTop) {
-        result = item
+      let node = nodeList[nodeTops[top]]
+      if (getOppositeOffsetToContainer(node.el) - node.offset <= scrollTop) {
+        result = node
       }
+    }
+    if (result) {
+      currentNode.el = result.el
+      currentNode.name = result.name
+      currentNode.top = result.top
     }
     dealResult(result)
 }
@@ -92,10 +98,15 @@ const updateNodeList = function(el, binding, vnode) {
   if (Object.keys(nodeList).length == 0) {
       scrollDom.addEventListener('scroll', handleScroll)
   }
+
   let { name, offset=0, callback } = binding.value
+  let top = el.offsetTop - offset
   el.attributes.name = name
 
-  let top = el.offsetTop - offset
+  if (currentNode.name && currentNode.name == name) {
+    scrollDom.scrollTop = scrollDom.scrollTop + top - currentNode.top
+  }
+
   if (name in nodeList) {
     delete nodeTops[nodeList[name].top]
   }
@@ -128,6 +139,7 @@ vueScrollwatch.install = function (Vue) {
     })
 }
 
-vueScrollwatch.scrollTo=scrollTo
-vueScrollwatch.setContainer=setContainer
+vueScrollwatch.scrollTo = scrollTo
+vueScrollwatch.setContainer = setContainer
+vueScrollwatch.currentNode = currentNode
 export default vueScrollwatch
