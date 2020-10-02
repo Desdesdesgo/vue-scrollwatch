@@ -1,12 +1,23 @@
+//   Scroll monitor component
 
 import bezierEasing from 'bezier-easing'
 
-//   滚动监听组件
+const getOffsetTop = function (element) {
+    let yPosition = 0
+    let nextElement = element
+
+    while (nextElement) {
+        yPosition += (nextElement.offsetTop)
+        nextElement = nextElement.offsetParent
+    }
+    return yPosition
+}
 
 let nodeList = {}
 let nodeTops = {}
 let currentNode = {}
 let scrollDom = document.scrollingElement
+let scrollDomOffset = getOffsetTop(scrollDom)
 let cubicBezierArray = [0.5, 0, 0.35, 1]
 let duration = 600
 let scrollAnimationFrame = null
@@ -24,7 +35,7 @@ const handleScroll = function () {
 
     for (let top of tops) {
       let node = nodeList[nodeTops[top]]
-      if (getOppositeOffsetToContainer(node.el) - node.offset <= scrollTop) {
+      if (Number(top) <= scrollTop + scrollDomOffset) {
         result = node
       }
     }
@@ -34,21 +45,6 @@ const handleScroll = function () {
       currentNode.top = result.top
     }
     dealResult(result)
-}
-
-const getOppositeOffsetToContainer = function (el) {
-    return getOffsetTopByEl(el) - getOffsetTopByEl(scrollDom)
-}
-
-const getOffsetTopByEl = function (element) {
-    let yPosition = 0
-    let nextElement = element
-
-    while (nextElement) {
-        yPosition += (nextElement.offsetTop)
-        nextElement = nextElement.offsetParent
-    }
-    return yPosition
 }
 
 const dealResult = function (result) {
@@ -61,7 +57,8 @@ const scrollTo = function (name) {
     let target_node = nodeList[name]
     if (!target_node) {reject(name)}
     const startingY = scrollDom.scrollTop
-    const difference = getOppositeOffsetToContainer(target_node.el) - startingY
+    const difference =
+        getOffsetTop(target_node.el) - scrollDomOffset - startingY
     const easing = bezierEasing(...cubicBezierArray)
     let start = null
     const step = (timestamp) => {
@@ -92,6 +89,7 @@ const setContainer = function (css_selector) {
   if(!scrollDom){
     throw `[vue-scrollwatch] Element '${css_selector}' was not found.`
   }
+  scrollDomOffset = getOffsetTop(scrollDom)
 }
 
 const updateNodeList = function(el, binding, vnode) {
@@ -127,9 +125,10 @@ vueScrollwatch.install = function (Vue) {
           if (Object.keys(nodeList).length == 0 && scrollDom) {
               scrollDom.removeEventListener('scroll', handleScroll)
               scrollDom = document.scrollingElement
+              scrollDomOffset = getOffsetTop(scrollDom)
           }
 
-          // 如果正在动画，则停止
+          // If it is animating, stop
           cancelAnimationFrame(scrollAnimationFrame)
         },
 
