@@ -32,19 +32,27 @@ const handleScroll = function () {
       }
     }
     let tops = Object.keys(nodeTops).sort((a, b) => a - b)
+    let last = tops.length - 1
+    if (last <= 0) return
 
-    for (let top of tops) {
-      let node = nodeList[nodeTops[top]]
-      if (Number(top) <= scrollTop + scrollDomOffset) {
-        result = node
-      }
-    }
-    if (result) {
-      currentNode.el = result.el
-      currentNode.name = result.name
-      currentNode.top = result.top
-    }
+    result = find_current(tops, scrollTop + scrollDomOffset, 0, last)
+    currentNode.el = result.el
+    currentNode.name = result.name
+    currentNode.top = result.top
     dealResult(result)
+}
+
+const find_current = function(tops, threshold, first, last) {
+  let mid = Math.floor((first + last) / 2)
+  let top = Number(tops[mid])
+  if (top <= threshold && Number(tops[mid + 1]) > threshold) {
+    return nodeList[nodeTops[tops[mid]]]
+  }
+  if (top <= threshold) {
+    return find_current(tops, threshold, mid + 1, last)
+  } else {
+    return find_current(tops, threshold, first, mid - 1)
+  }
 }
 
 const dealResult = function (result) {
