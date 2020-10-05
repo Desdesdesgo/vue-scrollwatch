@@ -13,16 +13,24 @@ const getOffsetTop = function (element) {
     return yPosition
 }
 
+let cubicBezierArray = [0.5, 0, 0.35, 1]
+let currentNode = {}
+let duration = 600
 let nodeList = {}
 let nodeTops = {}
-let currentNode = {}
+let scrollAnimationFrame = null
 let scrollDom = document.scrollingElement
 let scrollDomOffset = getOffsetTop(scrollDom)
-let cubicBezierArray = [0.5, 0, 0.35, 1]
-let duration = 600
-let scrollAnimationFrame = null
+let scrollTimer = null
+let scrollTimerDelay = 150
+
+const scrollDone = new Event('scroll_watch_done')
 
 const handleScroll = function () {
+  if (scrollTimer != null) {
+    clearTimeout(scrollTimer)
+  }
+  scrollTimer = setTimeout(function() {
     let scrollTop = scrollDom.scrollTop
     let result = null
     if (Object.keys(nodeList).length != Object.keys(nodeTops).length) {
@@ -35,11 +43,14 @@ const handleScroll = function () {
     let last = tops.length - 1
     if (last <= 0) return
 
-    result = find_current(tops, scrollTop + scrollDomOffset, 0, last)
+    let node = nodeList[nodeTops[tops[0]]]
+    result = find_current(tops, scrollTop + node.el.offsetTop, 0, last)
+    dealResult(currentNode, result, tops)
     currentNode.el = result.el
     currentNode.name = result.name
     currentNode.top = result.top
-    dealResult(result)
+    scrollDom.dispatchEvent(scrollDone)
+  }, scrollTimerDelay)
 }
 
 const find_current = function(tops, threshold, first, last) {
@@ -55,9 +66,15 @@ const find_current = function(tops, threshold, first, last) {
   }
 }
 
-const dealResult = function (result) {
-    if (result && result.callback)
-        result.callback(result)
+const dealResult = function (startNode, endNode, tops) {
+  let start = tops.indexOf(startNode.top.toString())
+  let end = tops.indexOf(endNode.top.toString())
+  let step = start < end ? 1 : -1
+  for (; step > 0 ? start <= end : start >= end; start += step) {
+    let node = nodeList[nodeTops[tops[start]]]
+    if (node && node.callback)
+        node.callback(node)
+  }
 }
 
 const scrollTo = function (name) {
@@ -100,6 +117,10 @@ const setContainer = function (css_selector) {
   scrollDomOffset = getOffsetTop(scrollDom)
 }
 
+const setScrollTimerDelay = function(delay){
+  scrollTimerDelay = delay
+}
+
 const updateNodeList = function(el, binding, vnode) {
   if (Object.keys(nodeList).length == 0) {
       scrollDom.addEventListener('scroll', handleScroll)
@@ -108,6 +129,12 @@ const updateNodeList = function(el, binding, vnode) {
   let { name, offset=0, callback } = binding.value
   let top = el.offsetTop - offset
   el.attributes.name = name
+
+  if (!currentNode.top) {
+    currentNode.el = el
+    currentNode.name = name
+    currentNode.top = top
+  }
 
   if (currentNode.name && currentNode.name == name) {
     scrollDom.scrollTop = scrollDom.scrollTop + top - currentNode.top
@@ -146,7 +173,8 @@ vueScrollwatch.install = function (Vue) {
     })
 }
 
+vueScrollwatch.currentNode = currentNode
 vueScrollwatch.scrollTo = scrollTo
 vueScrollwatch.setContainer = setContainer
-vueScrollwatch.currentNode = currentNode
+vueScrollwatch.setScrollTimerDelay = setScrollTimerDelay
 export default vueScrollwatch
