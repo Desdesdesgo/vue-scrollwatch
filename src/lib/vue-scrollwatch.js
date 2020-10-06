@@ -43,8 +43,8 @@ const handleScroll = function () {
     let last = tops.length - 1
     if (last <= 0) return
 
-    let node = nodeList[nodeTops[tops[0]]]
-    result = find_current(tops, scrollTop + node.el.offsetTop, 0, last)
+    let first_node_offset = nodeList[nodeTops[tops[0]]].el.offsetTop
+    result = find_current(tops, scrollTop + first_node_offset, 0, last)
     dealResult(currentNode, result, tops)
     currentNode.el = result.el
     currentNode.name = result.name
@@ -54,6 +54,7 @@ const handleScroll = function () {
 }
 
 const find_current = function(tops, threshold, first, last) {
+  if (first == last) return nodeList[nodeTops[tops[first]]]
   let mid = Math.floor((first + last) / 2)
   let top = Number(tops[mid])
   if (top <= threshold && Number(tops[mid + 1]) > threshold) {
