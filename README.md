@@ -4,9 +4,10 @@
 features：
 - auto detect element enter viewport when scroll
 - expose api: scrollTo , to scroll element to enter viewport 
-- you can set scroll container ,not just window
+- you can set scroll container, not just window
 - use vue directive
 - no limitation of nav list
+- you can block calling callbacks during `scrollTo` with `setBlockWatchOnJump` function with boolean argument
 
 特性：
 - 滚动时判断出窗口中当前元素
@@ -14,6 +15,7 @@ features：
 - 滚动容器自由指定，不局限于window
 - vue 指令的方式
 - 导航列表没有任何限制
+- 您可以使用带有布尔参数的setBlockWatchOnJump函数阻止在scrollTo期间调用回调
 
 
 [click to demo](https://Desdesdesgo.github.io/vue-scrollwatch/)
@@ -100,6 +102,7 @@ export default {
     ...
     created(){
         scrollWatch.setContainer("#scrollDom")
+        scrollWatch.setBlockWatchOnJump(true)
     }
     ...
 }

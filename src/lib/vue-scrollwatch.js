@@ -14,6 +14,8 @@ const getOffsetTop = function (element) {
 }
 
 let cubicBezierArray = [0.5, 0, 0.35, 1]
+let blockWatch = false
+let blockWatching = false
 let currentNode = {}
 let duration = 600
 let nodeList = {}
@@ -26,7 +28,7 @@ let scrollTimerDelay = 150
 
 const scrollDone = new Event('scroll_watch_done')
 
-const handleScroll = function () {
+const handleScroll = function (scroll) {
   if (scrollTimer != null) {
     clearTimeout(scrollTimer)
   }
@@ -45,7 +47,11 @@ const handleScroll = function () {
 
     let first_node_offset = nodeList[nodeTops[tops[0]]].el.offsetTop
     result = find_current(tops, scrollTop + first_node_offset, 0, last)
-    dealResult(currentNode, result, tops)
+    if (blockWatch) {
+      blockWatch = false
+    } else {
+      dealResult(currentNode, result, tops)
+    }
     currentNode.el = result.el
     currentNode.name = result.name
     currentNode.top = result.top
@@ -80,6 +86,7 @@ const dealResult = function (startNode, endNode, tops) {
 
 const scrollTo = function (name) {
   let promise = new Promise(function (resolve, reject) {
+    if (blockWatching) blockWatch = true
     let target_node = nodeList[name]
     if (!target_node) {reject(name)}
     const startingY = scrollDom.scrollTop
@@ -92,7 +99,6 @@ const scrollTo = function (name) {
         let progress = timestamp - start >= duration ? duration : (timestamp - start)
         let progressPercentage = progress / duration
         const perTick = startingY + (easing(progressPercentage) * (difference - target_node.offset))
-
         moveTo(perTick)
 
         if (progress < duration) {
@@ -108,6 +114,10 @@ const scrollTo = function (name) {
 
 const moveTo = function(scrollTop){
     scrollDom.scrollTop = scrollTop
+}
+
+const setBlockWatchOnJump = function(value) {
+  blockWatching = !!value
 }
 
 const setContainer = function (css_selector) {
@@ -176,6 +186,7 @@ vueScrollwatch.install = function (Vue) {
 
 vueScrollwatch.currentNode = currentNode
 vueScrollwatch.scrollTo = scrollTo
+vueScrollwatch.setBlockWatchOnJump = setBlockWatchOnJump
 vueScrollwatch.setContainer = setContainer
 vueScrollwatch.setScrollTimerDelay = setScrollTimerDelay
 export default vueScrollwatch
