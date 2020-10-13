@@ -76,7 +76,9 @@ const find_current = function(tops, threshold, first, last) {
 const dealResult = function (startNode, endNode, tops) {
   let start = tops.indexOf(startNode.top.toString())
   let end = tops.indexOf(endNode.top.toString())
+  if (start == end) return
   let step = start < end ? 1 : -1
+  start += step
   for (; step > 0 ? start <= end : start >= end; start += step) {
     let node = nodeList[nodeTops[tops[start]]]
     if (node && node.callback)
@@ -99,6 +101,7 @@ const scrollTo = function (name) {
         let progress = timestamp - start >= duration ? duration : (timestamp - start)
         let progressPercentage = progress / duration
         const perTick = startingY + (easing(progressPercentage) * (difference - target_node.offset))
+
         moveTo(perTick)
 
         if (progress < duration) {
@@ -132,7 +135,7 @@ const setScrollTimerDelay = function(delay){
   scrollTimerDelay = delay
 }
 
-const updateNodeList = function(el, binding, vnode) {
+const updateNodeList = function(el, binding, vnode, fn) {
   if (Object.keys(nodeList).length == 0) {
       scrollDom.addEventListener('scroll', handleScroll)
   }
@@ -147,7 +150,10 @@ const updateNodeList = function(el, binding, vnode) {
     currentNode.top = top
   }
 
-  if (currentNode.name && currentNode.name == name) {
+  // correct the position of the currentNode
+  if (currentNode.name && currentNode.name == name &&
+        top - currentNode.top != 0) {
+    blockWatch = true
     scrollDom.scrollTop = scrollDom.scrollTop + top - currentNode.top
   }
 
@@ -162,7 +168,7 @@ let vueScrollwatch={}
 vueScrollwatch.install = function (Vue) {
     Vue.directive('scrollWatch', {
         inserted: function (el, binding, vnode) {
-          updateNodeList(el, binding, vnode)
+          updateNodeList(el, binding, vnode, 'inserted')
         },
 
         unbind: function (el, binding, vnode) {
@@ -179,7 +185,7 @@ vueScrollwatch.install = function (Vue) {
         },
 
         update: function (el, binding, vnode) {
-          updateNodeList(el, binding, vnode)
+          updateNodeList(el, binding, vnode, 'update')
         },
     })
 }
