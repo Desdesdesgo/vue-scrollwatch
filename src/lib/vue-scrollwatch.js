@@ -16,6 +16,7 @@ const getOffsetTop = function (element) {
 let cubicBezierArray = [0.5, 0, 0.35, 1]
 let blockWatch = false
 let blockWatching = false
+let adjustScrollPosition = true
 let currentNode = {}
 let duration = 600
 let nodeList = {}
@@ -119,22 +120,6 @@ const moveTo = function(scrollTop){
     scrollDom.scrollTop = scrollTop
 }
 
-const setBlockWatchOnJump = function(value) {
-  blockWatching = !!value
-}
-
-const setContainer = function (css_selector) {
-  scrollDom = document.querySelector(css_selector)
-  if(!scrollDom){
-    throw `[vue-scrollwatch] Element '${css_selector}' was not found.`
-  }
-  scrollDomOffset = getOffsetTop(scrollDom)
-}
-
-const setScrollTimerDelay = function(delay){
-  scrollTimerDelay = delay
-}
-
 const updateNodeList = function(el, binding, vnode, fn) {
   if (Object.keys(nodeList).length == 0) {
       scrollDom.addEventListener('scroll', handleScroll)
@@ -150,8 +135,8 @@ const updateNodeList = function(el, binding, vnode, fn) {
     currentNode.top = top
   }
 
-  // correct the position of the currentNode
-  if (currentNode.name && currentNode.name == name &&
+  if (adjustScrollPosition &&
+        currentNode.name && currentNode.name == name &&
         top - currentNode.top != 0) {
     blockWatch = true
     scrollDom.scrollTop = scrollDom.scrollTop + top - currentNode.top
@@ -190,9 +175,30 @@ vueScrollwatch.install = function (Vue) {
     })
 }
 
+const setBlockWatchOnJump = function(value) {
+  blockWatching = !!value
+}
+
+const setContainer = function (css_selector) {
+  scrollDom = document.querySelector(css_selector)
+  if(!scrollDom){
+    throw `[vue-scrollwatch] Element '${css_selector}' was not found.`
+  }
+  scrollDomOffset = getOffsetTop(scrollDom)
+}
+
+const setAdjustPositionAfterInsertion = function(value) {
+  adjustScrollPosition = !!value
+}
+
+const setScrollTimerDelay = function(delay){
+  scrollTimerDelay = delay
+}
+
 vueScrollwatch.currentNode = currentNode
 vueScrollwatch.scrollTo = scrollTo
 vueScrollwatch.setBlockWatchOnJump = setBlockWatchOnJump
 vueScrollwatch.setContainer = setContainer
+vueScrollwatch.setAdjustPositionAfterInsertion = setAdjustPositionAfterInsertion
 vueScrollwatch.setScrollTimerDelay = setScrollTimerDelay
 export default vueScrollwatch

@@ -2,12 +2,12 @@
 
 > scrollwatch
 features：
-- auto detect element enter viewport when scroll
-- expose api: scrollTo , to scroll element to enter viewport 
+- auto detect element enter viewpoint when scroll
+- expose api: scrollTo , to scroll element to enter viewpoint and others
 - you can set scroll container, not just window
 - use vue directive
 - no limitation of nav list
-- you can block calling callbacks during `scrollTo` with `setBlockWatchOnJump` function with boolean argument
+
 
 特性：
 - 滚动时判断出窗口中当前元素
@@ -115,6 +115,7 @@ export default {
 
 
 ## Options
+
 #### name
 *required:* `true` 
 
@@ -129,6 +130,61 @@ export default {
 ``` js
  npm run dev
 ```
+
+## API
+
+### currentNode()
+
+Returns an Object with the information about the last element passed the
+viewpoint during the scroll. It has the following properties:
+
+- el: the element itself
+- name: the `name` options assigned to the element
+- top: el.offsetTop minus `offset` assigned to the element
+
+### scrollTo(name)
+
+Scrolls the content to expose the element that has the option `name`
+equal to the given `name` at the viewpoint.
+
+### setAdjustPositionAfterInsertion(value)
+
+If you insert any elements above `currentNode().el` it will move down
+and may even disappear below the bottom of the scrolling area observed.
+But the library is aware of this situation and automatically adjust
+the scrolling position so that visible elements do not move.
+
+But when the element with `v-scroll-watch` directive is not a standard
+html element but **Vue.js** *component*, this adjustment is not
+required as **Vue.js** makes it self.
+
+So, in the latter case you should call this function with `true` to
+disable the unneeded correction.
+
+### setBlockWatchOnJump(value)
+
+In some cases you could not want the `callback`s to be done while
+`scrollTo` is executed. Then pass the value `true`. By default the
+the value is `false` and the callbacks are not blocked and are acitvated.
+
+### setContainer(css_selector)
+
+By default the scrollWatch operates on the whole document. That means
+`document.scrollingElement` is used that usually is `<html>`.
+Call to this function assigns the functionality to the first
+element of DOM, that conforms to the `css_selector`.
+
+### setScrollTimerDelay(µs)
+
+Scrolling generates a lot of events. If every event will cause the
+corresponding the `callback`, it will significantly slow down
+the whole application.
+
+To avoid this situation the timeout was introduced. All the elements
+that have passed through the defined viewpoint will receive only one
+callback after the defined timeout since the scrolling stopped.
+
+By default is is 150µs. You can change the value via this call.
 
 ## Thanks
 [vue-scrollactive](https://github.com/eddiemf/vue-scrollactive.git)
