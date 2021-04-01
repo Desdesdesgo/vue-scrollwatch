@@ -27,6 +27,10 @@ features：
 ```bash
 npm install --save vue-scrollwatch
 ```
+or
+```bash
+yarn add vue-scrollwatch
+```
 
 in `main.js`
 ```js 
@@ -188,4 +192,3 @@ By default is is 150µs. You can change the value via this call.
 
 ## Thanks
 [vue-scrollactive](https://github.com/eddiemf/vue-scrollactive.git)
-

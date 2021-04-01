@@ -7,8 +7,8 @@ const getOffsetTop = function (element) {
     let nextElement = element
 
     while (nextElement) {
-        yPosition += (nextElement.offsetTop)
-        nextElement = nextElement.offsetParent
+      yPosition += (nextElement.offsetTop)
+      nextElement = nextElement.offsetParent
     }
     return yPosition
 }
@@ -23,7 +23,6 @@ let nodeList = {}
 let nodeTops = {}
 let scrollAnimationFrame = null
 let scrollDom = document.scrollingElement
-let scrollDomOffset = getOffsetTop(scrollDom)
 let scrollTimer = null
 let scrollTimerDelay = 150
 
@@ -93,6 +92,7 @@ const scrollTo = function (name) {
     let target_node = nodeList[name]
     if (!target_node) {reject(name)}
     const startingY = scrollDom.scrollTop
+    let scrollDomOffset = getOffsetTop(scrollDom)
     const difference =
         getOffsetTop(target_node.el) - scrollDomOffset - startingY
     const easing = bezierEasing(...cubicBezierArray)
@@ -162,7 +162,6 @@ vueScrollwatch.install = function (Vue) {
           if (Object.keys(nodeList).length == 0 && scrollDom) {
               scrollDom.removeEventListener('scroll', handleScroll)
               scrollDom = document.scrollingElement
-              scrollDomOffset = getOffsetTop(scrollDom)
           }
 
           // If it is animating, stop
@@ -184,7 +183,6 @@ const setContainer = function (css_selector) {
   if(!scrollDom){
     throw `[vue-scrollwatch] Element '${css_selector}' was not found.`
   }
-  scrollDomOffset = getOffsetTop(scrollDom)
 }
 
 const setAdjustPositionAfterInsertion = function(value) {
