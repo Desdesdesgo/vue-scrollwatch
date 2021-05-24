@@ -19,8 +19,8 @@ features：
 
 
 [click to demo](https://Desdesdesgo.github.io/vue-scrollwatch/)
- 
- learning usage from src/views/page1.vue and page2.vue  
+
+ learning usage from src/views/page1.vue and page2.vue
  查看源码中的src/views/page1.vue and page2.vue 获得详细使用方式
 ## Installation
 
@@ -33,13 +33,13 @@ yarn add vue-scrollwatch
 ```
 
 in `main.js`
-```js 
+```js
 import vueScrollwatch from "vue-scrollwatch"
 Vue.use(vueScrollwatch)
 ```
 
 ## Usage
- 导航   
+ 导航
  nav
 ```html
 <ul>
@@ -62,7 +62,7 @@ element to watch
 ```
 
 `callback` and `scrollTo` in methods
-```js 
+```js
 import scrollWatch from "vue-scrollwatch"
 export default {
     ...
@@ -87,8 +87,8 @@ You can also use `scrollTo` as a promise:
     .catch(report_unknown_name(name))
 ```
 
- if you want to define a container to scroll (not window)  
- 如果你想指定滚动容器，而不是window 
+ if you want to define a container to scroll (not window)
+ 如果你想指定滚动容器，而不是window
 
 ```html
 <div id="scrollDom">
@@ -100,7 +100,7 @@ You can also use `scrollTo` as a promise:
 ```
 
 
-```js 
+```js
 import scrollWatch from "vue-scrollwatch"
 export default {
     ...
@@ -111,22 +111,22 @@ export default {
     ...
 }
 ```
- you also can use class as selector  
+ you also can use class as selector
  你也可以使用 class 来作为css 选择器
 
- container and element to be watch hasn't to be father and sons,it also can be grandfather or grand-grandfather  
+ container and element to be watch hasn't to be father and sons,it also can be grandfather or grand-grandfather
  滚动容器和监听元素之间不一定是父子关系,可以是爷孙关系，也可以是祖宗孙子关系
 
 
 ## Options
 
 #### name
-*required:* `true` 
+*required:* `true`
 
 #### offset
 元素位置偏移
 *default:* `0`
- 
+
 #### callback
 *type:* `function`
 
@@ -146,16 +146,21 @@ viewpoint during the scroll. It has the following properties:
 - name: the `name` options assigned to the element
 - top: el.offsetTop minus `offset` assigned to the element
 
+### jumpTo(name)
+
+Exposed the element that has the option `name` equal to the given `name`
+at the viewpoint without scrolling.
+
 ### scrollTo(name)
 
 Scrolls the content to expose the element that has the option `name`
-equal to the given `name` at the viewpoint.
+equal to the given `name` at the viewpoint. Returns a promise.
 
 ### setAdjustPositionAfterInsertion(value)
 
 If you insert any elements above `currentNode().el` it will move down
 and may even disappear below the bottom of the scrolling area observed.
-But the library is aware of this situation and automatically adjust
+But the library is aware of this situation and automatically adjusts
 the scrolling position so that visible elements do not move.
 
 But when the element with `v-scroll-watch` directive is not a standard

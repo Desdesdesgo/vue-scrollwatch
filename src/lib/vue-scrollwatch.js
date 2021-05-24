@@ -86,6 +86,16 @@ const dealResult = function (startNode, endNode, tops) {
   }
 }
 
+const jumpTo = function (name) {
+    if (blockWatching) blockWatch = true
+    let target_node = nodeList[name]
+    if (!target_node) return
+    moveTo(target_node.top - getOffsetTop(scrollDom))
+    currentNode.el = target_node.el
+    currentNode.name = target_node.name
+    currentNode.top = target_node.top
+}
+
 const scrollTo = function (name) {
   let promise = new Promise(function (resolve, reject) {
     if (blockWatching) blockWatch = true
@@ -194,6 +204,7 @@ const setScrollTimerDelay = function(delay){
 }
 
 vueScrollwatch.currentNode = currentNode
+vueScrollwatch.jumpTo = jumpTo
 vueScrollwatch.scrollTo = scrollTo
 vueScrollwatch.setBlockWatchOnJump = setBlockWatchOnJump
 vueScrollwatch.setContainer = setContainer
