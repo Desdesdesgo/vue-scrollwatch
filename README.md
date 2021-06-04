@@ -156,20 +156,6 @@ at the viewpoint without scrolling.
 Scrolls the content to expose the element that has the option `name`
 equal to the given `name` at the viewpoint. Returns a promise.
 
-### setAdjustPositionAfterInsertion(value)
-
-If you insert any elements above `currentNode().el` it will move down
-and may even disappear below the bottom of the scrolling area observed.
-But the library is aware of this situation and automatically adjusts
-the scrolling position so that visible elements do not move.
-
-But when the element with `v-scroll-watch` directive is not a standard
-html element but **Vue.js** *component*, this adjustment is not
-required as **Vue.js** makes it self.
-
-So, in the latter case you should call this function with `true` to
-disable the unneeded correction.
-
 ### setBlockWatchOnJump(value)
 
 In some cases you could not want the `callback`s to be done while

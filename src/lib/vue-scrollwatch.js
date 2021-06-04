@@ -16,7 +16,6 @@ const getOffsetTop = function (element) {
 let cubicBezierArray = [0.5, 0, 0.35, 1]
 let blockWatch = false
 let blockWatching = false
-let adjustScrollPosition = true
 let currentNode = {}
 let duration = 600
 let nodeList = {}
@@ -33,30 +32,33 @@ const handleScroll = function (scroll) {
     clearTimeout(scrollTimer)
   }
   scrollTimer = setTimeout(function() {
-    let scrollTop = scrollDom.scrollTop
-    let result = null
-    if (Object.keys(nodeList).length != Object.keys(nodeTops).length) {
-      nodeTops = {}
-      for (let name in nodeList) {
-        nodeTops[nodeList[name].top] = nodeList[name].name
-      }
-    }
-    let tops = Object.keys(nodeTops).sort((a, b) => a - b)
-    let last = tops.length - 1
-    if (last <= 0) return
-
-    let first_node_offset = nodeList[nodeTops[tops[0]]].el.offsetTop
-    result = find_current(tops, scrollTop + first_node_offset, 0, last)
+    let [current_node, tops] = get_current_node_and_tops()
     if (blockWatch) {
       blockWatch = false
     } else {
-      dealResult(currentNode, result, tops)
+      dealResult(currentNode, current_node, tops)
     }
-    currentNode.el = result.el
-    currentNode.name = result.name
-    currentNode.top = result.top
+    currentNode.el = current_node.el
+    currentNode.name = current_node.name
+    currentNode.top = current_node.top
     scrollDom.dispatchEvent(scrollDone)
   }, scrollTimerDelay)
+}
+
+const get_current_node_and_tops = function() {
+  let scrollTop = scrollDom.scrollTop
+  if (Object.keys(nodeList).length != Object.keys(nodeTops).length) {
+    nodeTops = {}
+    for (let name in nodeList) {
+      nodeTops[nodeList[name].top] = nodeList[name].name
+    }
+  }
+  let tops = Object.keys(nodeTops).sort((a, b) => a - b)
+  let last = tops.length - 1
+  if (last <= 0) return
+
+  let first_node_offset = nodeList[nodeTops[tops[0]]].el.offsetTop
+  return [find_current(tops, scrollTop + first_node_offset, 0, last), tops]
 }
 
 const find_current = function(tops, threshold, first, last) {
@@ -145,11 +147,10 @@ const updateNodeList = function(el, binding, vnode, fn) {
     currentNode.top = top
   }
 
-  if (adjustScrollPosition &&
-        currentNode.name && currentNode.name == name &&
-        top - currentNode.top != 0) {
-    blockWatch = true
-    scrollDom.scrollTop = scrollDom.scrollTop + top - currentNode.top
+  if (currentNode.name) {
+    let current_name = get_current_node_and_tops()
+    current_name = current_name && current_name[0].name
+    if (currentNode.name != current_name) jumpTo(currentNode.name)
   }
 
   if (name in nodeList) {
@@ -195,10 +196,6 @@ const setContainer = function (css_selector) {
   }
 }
 
-const setAdjustPositionAfterInsertion = function(value) {
-  adjustScrollPosition = !!value
-}
-
 const setScrollTimerDelay = function(delay){
   scrollTimerDelay = delay
 }
@@ -208,6 +205,5 @@ vueScrollwatch.jumpTo = jumpTo
 vueScrollwatch.scrollTo = scrollTo
 vueScrollwatch.setBlockWatchOnJump = setBlockWatchOnJump
 vueScrollwatch.setContainer = setContainer
-vueScrollwatch.setAdjustPositionAfterInsertion = setAdjustPositionAfterInsertion
 vueScrollwatch.setScrollTimerDelay = setScrollTimerDelay
 export default vueScrollwatch
