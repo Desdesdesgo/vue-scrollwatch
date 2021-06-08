@@ -120,6 +120,7 @@ const scrollTo = function (name) {
         if (progress < duration) {
           scrollAnimationFrame = window.requestAnimationFrame(step)
         } else {
+          jumpTo(name)
           resolve(target_node)
         }
     }
