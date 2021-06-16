@@ -24,6 +24,7 @@ let scrollAnimationFrame = null
 let scrollDom = document.scrollingElement
 let scrollTimer = null
 let scrollTimerDelay = 150
+let adjust = 0
 
 const scrollDone = new Event('scroll_watch_done')
 
@@ -92,7 +93,7 @@ const jumpTo = function (name) {
     if (blockWatching) blockWatch = true
     let target_node = nodeList[name]
     if (!target_node) return
-    moveTo(target_node.top - getOffsetTop(scrollDom))
+    moveTo(getOffsetTop(target_node.el) - getOffsetTop(scrollDom) + adjust)
     currentNode.el = target_node.el
     currentNode.name = target_node.name
     currentNode.top = target_node.top
@@ -106,7 +107,7 @@ const scrollTo = function (name) {
     const startingY = scrollDom.scrollTop
     let scrollDomOffset = getOffsetTop(scrollDom)
     const difference =
-        getOffsetTop(target_node.el) - scrollDomOffset - startingY
+        getOffsetTop(target_node.el) - scrollDomOffset - startingY + adjust
     const easing = bezierEasing(...cubicBezierArray)
     let start = null
     const step = (timestamp) => {
@@ -146,6 +147,7 @@ const updateNodeList = function(el, binding, vnode, fn) {
     currentNode.el = el
     currentNode.name = name
     currentNode.top = top
+    adjust = Math.max(0, scrollDom.offsetTop - el.offsetTop)
   }
 
   if (currentNode.name) {
