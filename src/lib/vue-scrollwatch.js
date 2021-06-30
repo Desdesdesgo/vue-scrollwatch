@@ -93,7 +93,7 @@ const jumpTo = function (name) {
     if (blockWatching) blockWatch = true
     let target_node = nodeList[name]
     if (!target_node) return
-    moveTo(getOffsetTop(target_node.el) - getOffsetTop(scrollDom) + adjust)
+    moveTo(getOffsetTop(target_node.el) - getOffsetTop(scrollDom) - target_node.offset + adjust)
     currentNode.el = target_node.el
     currentNode.name = target_node.name
     currentNode.top = target_node.top
