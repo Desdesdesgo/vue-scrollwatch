@@ -25,6 +25,7 @@ let scrollDom = document.scrollingElement
 let scrollTimer = null
 let scrollTimerDelay = 150
 let adjust = 0
+let globalOffset = 0
 
 const scrollDone = new Event('scroll_watch_done')
 
@@ -94,7 +95,8 @@ const jumpTo = function (name) {
     if (blockWatching) blockWatch = true
     let target_node = nodeList[name]
     if (!target_node) return
-    moveTo(getOffsetTop(target_node.el) - getOffsetTop(scrollDom) - target_node.offset + adjust)
+    moveTo(getOffsetTop(target_node.el) - getOffsetTop(scrollDom) -
+              target_node.offset - globalOffset + adjust)
     currentNode.el = target_node.el
     currentNode.name = target_node.name
     currentNode.top = target_node.top
@@ -113,9 +115,10 @@ const scrollTo = function (name) {
     let start = null
     const step = (timestamp) => {
         if (!start) start = timestamp
-        let progress = timestamp - start >= duration ? duration : (timestamp - start)
+        let progress = timestamp - start >= duration ? duration
+                                                     : (timestamp - start)
         let progressPercentage = progress / duration
-        const perTick = startingY + (easing(progressPercentage) * (difference - target_node.offset))
+        const perTick = startingY + (easing(progressPercentage) * (difference - target_node.offset - globalOffset))
 
         moveTo(perTick)
 
@@ -204,10 +207,16 @@ const setScrollTimerDelay = function(delay){
   scrollTimerDelay = delay
 }
 
+const setGlobalOffset = function(offset) {
+  globalOffset = offset
+  console.log('vueScrollwatch@212#setGlobalOffset', offset, globalOffset)
+}
+
 vueScrollwatch.currentNode = currentNode
 vueScrollwatch.jumpTo = jumpTo
 vueScrollwatch.scrollTo = scrollTo
 vueScrollwatch.setBlockWatchOnJump = setBlockWatchOnJump
 vueScrollwatch.setContainer = setContainer
 vueScrollwatch.setScrollTimerDelay = setScrollTimerDelay
+vueScrollwatch.setGlobalOffset = setGlobalOffset
 export default vueScrollwatch
