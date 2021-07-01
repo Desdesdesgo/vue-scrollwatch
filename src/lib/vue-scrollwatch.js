@@ -59,6 +59,7 @@ const get_current_node_and_tops = function() {
   if (last <= 0) return
 
   let first_node_offset = nodeList[nodeTops[tops[0]]].el.offsetTop
+  if (first_node_offset < tops[0]) return [nodeList[nodeTops[tops[0]]], tops]
   return [find_current(tops, scrollTop + first_node_offset, 0, last), tops]
 }
 
