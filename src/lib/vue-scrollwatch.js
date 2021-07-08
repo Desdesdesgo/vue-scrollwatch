@@ -2,7 +2,7 @@
 
 import bezierEasing from 'bezier-easing'
 
-const getOffsetTop = function (element) {
+const getOT = function (element) {
     let yPosition = 0
     let nextElement = element
 
@@ -24,8 +24,8 @@ let scrollAnimationFrame = null
 let scrollDom = document.scrollingElement
 let scrollTimer = null
 let scrollTimerDelay = 150
-let adjust = 0
-let globalOffset = 0
+let _db = function() {}
+let _name ='vueScrollwatch'
 
 const scrollDone = new Event('scroll_watch_done')
 
@@ -34,44 +34,65 @@ const handleScroll = function (scroll) {
     clearTimeout(scrollTimer)
   }
   scrollTimer = setTimeout(function() {
-    let [current_node, tops] = get_current_node_and_tops()
+    let [new_current_node, tops] = get_current_node_and_tops()
     if (blockWatch) {
       blockWatch = false
     } else {
-      dealResult(currentNode, current_node, tops)
+      dealResult(currentNode, new_current_node, tops)
     }
-    currentNode.el = current_node.el
-    currentNode.name = current_node.name
-    currentNode.top = current_node.top
+    currentNode.el = new_current_node.el
+    currentNode.name = new_current_node.name
+    currentNode.top = new_current_node.top
+      _db(10, () => [_name, '#handleScroll', new_current_node.name, new_current_node.top])
     scrollDom.dispatchEvent(scrollDone)
   }, scrollTimerDelay)
 }
 
+const get_common_offset = function() {
+  let first_node = nodeList[Object.keys(nodeList).sort()[0]]
+  if (! first_node) return 0
+  return first_node.top - scrollDomOT()
+}
+
 const get_current_node_and_tops = function() {
-  let scrollTop = scrollDom.scrollTop
-  if (Object.keys(nodeList).length != Object.keys(nodeTops).length) {
-    nodeTops = {}
-    for (let name in nodeList) {
-      nodeTops[nodeList[name].top] = nodeList[name].name
-    }
-  }
-  let tops = Object.keys(nodeTops).sort((a, b) => a - b)
+  let first_node = nodeList[Object.keys(nodeList).sort()[0]]
+  try_update_node_tops(first_node,
+                       Object.keys(nodeList).length != Object.keys(nodeTops).length)
+  let tops = Object.keys(nodeTops).map(v => Number(v)).sort((a, b) => a - b)
   let last = tops.length - 1
   if (last <= 0) return
 
-  let first_node_offset = nodeList[nodeTops[tops[0]]].el.offsetTop
-  if (first_node_offset < tops[0]) return [nodeList[nodeTops[tops[0]]], tops]
-  return [find_current(tops, scrollTop + first_node_offset, 0, last), tops]
+  // We assume that all nodes have the sam #offset.
+  // Otherwise we have to use #offset in #find_current
+  let threshold = Math.ceil(scrollDom.scrollTop + first_node.top + first_node.offset)
+    _db(10, () => [_name, '#get_current_node_and_tops', scrollDom.scrollTop, first_node.top, first_node.offset, threshold])
+  return [
+    find_current(tops, threshold, 0, last),
+    tops
+  ]
+}
+
+const try_update_node_tops = function(node, force) {
+  if (force == false || getOT(node.el) == node.top) return
+    _db(10, () => [_name, '#try_update_node_tops', force || getOT(node.el) - node.top])
+  nodeTops = {}
+  for (let name in nodeList) {
+    let node = nodeList[name]
+    let nodeOT = getOT(node.el)
+    if (nodeOT != node.top) node.top = nodeOT
+    nodeTops[node.top] = node.name
+  }
 }
 
 const find_current = function(tops, threshold, first, last) {
+    _db(10, () => [_name, '#find_current', tops[first], tops[last], threshold, first, last])
   if (first == last) return nodeList[nodeTops[tops[first]]]
   let mid = Math.floor((first + last) / 2)
-  let top = Number(tops[mid])
-  if (top <= threshold && Number(tops[mid + 1]) > threshold) {
+  if (tops[mid] <= threshold && tops[mid + 1] > threshold) {
+      _db(10, () => [_name, '#find_current', tops[mid], mid])
     return nodeList[nodeTops[tops[mid]]]
   }
-  if (top <= threshold) {
+  if (tops[mid] <= threshold) {
     return find_current(tops, threshold, mid + 1, last)
   } else {
     return find_current(tops, threshold, first, mid - 1)
@@ -79,8 +100,8 @@ const find_current = function(tops, threshold, first, last) {
 }
 
 const dealResult = function (startNode, endNode, tops) {
-  let start = tops.indexOf(startNode.top.toString())
-  let end = tops.indexOf(endNode.top.toString())
+  let start = tops.indexOf(startNode.top)
+  let end = tops.indexOf(endNode.top)
   if (start == end) return
   let step = start < end ? 1 : -1
   start += step
@@ -92,14 +113,18 @@ const dealResult = function (startNode, endNode, tops) {
 }
 
 const jumpTo = function (name) {
-    if (blockWatching) blockWatch = true
-    let target_node = nodeList[name]
-    if (!target_node) return
-    moveTo(getOffsetTop(target_node.el) - getOffsetTop(scrollDom) -
-              target_node.offset - globalOffset + adjust)
-    currentNode.el = target_node.el
-    currentNode.name = target_node.name
-    currentNode.top = target_node.top
+  if (blockWatching) blockWatch = true
+  let target_node = nodeList[name]
+  if (!target_node) return
+  try_update_node_tops(target_node)
+  moveTo(target_node.top - target_node.offset - scrollDomOT() - get_common_offset())
+  currentNode.el = target_node.el
+  currentNode.name = target_node.name
+  currentNode.top = target_node.top
+}
+
+const scrollDomOT = function() {
+  return getOT(scrollDom)
 }
 
 const scrollTo = function (name) {
@@ -108,9 +133,9 @@ const scrollTo = function (name) {
     let target_node = nodeList[name]
     if (!target_node) {reject(name)}
     const startingY = scrollDom.scrollTop
-    let scrollDomOffset = getOffsetTop(scrollDom)
-    const difference =
-        getOffsetTop(target_node.el) - scrollDomOffset - startingY + adjust
+    const difference = target_node.top - target_node.offset - get_common_offset()
+                - scrollDomOT() - startingY
+    try_update_node_tops(target_node)
     const easing = bezierEasing(...cubicBezierArray)
     let start = null
     const step = (timestamp) => {
@@ -118,14 +143,14 @@ const scrollTo = function (name) {
         let progress = timestamp - start >= duration ? duration
                                                      : (timestamp - start)
         let progressPercentage = progress / duration
-        const perTick = startingY + (easing(progressPercentage) * (difference - target_node.offset - globalOffset))
+        const perTick = startingY + (easing(progressPercentage) * difference)
 
         moveTo(perTick)
 
         if (progress < duration) {
           scrollAnimationFrame = window.requestAnimationFrame(step)
         } else {
-          jumpTo(name)
+          //jumpTo(name)
           resolve(target_node)
         }
     }
@@ -135,7 +160,8 @@ const scrollTo = function (name) {
 }
 
 const moveTo = function(scrollTop){
-    scrollDom.scrollTop = scrollTop
+    _db(10, () => [_name, '#moveTo', scrollTop])
+  scrollDom.scrollTop = scrollTop
 }
 
 const updateNodeList = function(el, binding, vnode, fn) {
@@ -144,52 +170,29 @@ const updateNodeList = function(el, binding, vnode, fn) {
   }
 
   let { name, offset=0, callback } = binding.value
-  let top = el.offsetTop - offset
+  let top = getOT(el)
   el.attributes.name = name
 
-  if (!currentNode.top) {
+  if (!currentNode.name) {
     currentNode.el = el
     currentNode.name = name
     currentNode.top = top
-    adjust = Math.max(0, scrollDom.offsetTop - el.offsetTop)
+    currentNode.offset = offset
   }
 
   if (currentNode.name) {
     let current_name = get_current_node_and_tops()
     current_name = current_name && current_name[0].name
+      _db(10, () => [_name, '#updateNodeList', current_name, currentNode.name])
     if (currentNode.name != current_name) jumpTo(currentNode.name)
   }
 
   if (name in nodeList) {
     delete nodeTops[nodeList[name].top]
   }
-  nodeList[name] = { name, offset, top: top, el, callback }
+  nodeList[name] = { name, offset, top, el, callback }
   nodeTops[top] = name
-}
-
-let vueScrollwatch={}
-vueScrollwatch.install = function (Vue) {
-    Vue.directive('scrollWatch', {
-        inserted: function (el, binding, vnode) {
-          updateNodeList(el, binding, vnode, 'inserted')
-        },
-
-        unbind: function (el, binding, vnode) {
-          delete nodeTops[nodeList[binding.value.name].top]
-          delete nodeList[binding.value.name]
-          if (Object.keys(nodeList).length == 0 && scrollDom) {
-              scrollDom.removeEventListener('scroll', handleScroll)
-              scrollDom = document.scrollingElement
-          }
-
-          // If it is animating, stop
-          cancelAnimationFrame(scrollAnimationFrame)
-        },
-
-        update: function (el, binding, vnode) {
-          updateNodeList(el, binding, vnode, 'update')
-        },
-    })
+    _db(10, () => [_name, '#updateNodeList', name, offset, top, getOT(el)])
 }
 
 const setBlockWatchOnJump = function(value) {
@@ -207,9 +210,35 @@ const setScrollTimerDelay = function(delay){
   scrollTimerDelay = delay
 }
 
-const setGlobalOffset = function(offset) {
-  globalOffset = offset
-  console.log('vueScrollwatch@212#setGlobalOffset', offset, globalOffset)
+let vueScrollwatch={}
+
+vueScrollwatch.install = function (Vue) {
+  Vue.directive('scrollWatch', {
+    bind: function (el, binding, vnode) {
+      if (typeof binding.value.db =='function') _db = binding.value.db
+    },
+
+    inserted: function (el, binding, vnode) {
+      updateNodeList(el, binding, vnode, 'inserted')
+    },
+
+    unbind: function (el, binding, vnode) {
+        _db(10, () => [_name, '#install:unbind', binding.value.name, nodeList[binding.value.name].top])
+      delete nodeTops[nodeList[binding.value.name].top]
+      delete nodeList[binding.value.name]
+      if (Object.keys(nodeList).length == 0 && scrollDom) {
+          scrollDom.removeEventListener('scroll', handleScroll)
+          scrollDom = document.scrollingElement
+      }
+
+      // If it is animating, stop
+      cancelAnimationFrame(scrollAnimationFrame)
+    },
+
+    update: function (el, binding, vnode) {
+      updateNodeList(el, binding, vnode, 'update')
+    },
+  })
 }
 
 vueScrollwatch.currentNode = currentNode
@@ -218,5 +247,9 @@ vueScrollwatch.scrollTo = scrollTo
 vueScrollwatch.setBlockWatchOnJump = setBlockWatchOnJump
 vueScrollwatch.setContainer = setContainer
 vueScrollwatch.setScrollTimerDelay = setScrollTimerDelay
-vueScrollwatch.setGlobalOffset = setGlobalOffset
+
+vueScrollwatch.nodeList = nodeList
+vueScrollwatch.nodeTops = nodeTops
+vueScrollwatch.moveTo = moveTo
+
 export default vueScrollwatch
