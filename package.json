@@ -1,14 +1,14 @@
 {
   "name": "vue-scrollwatch",
   "description": "scrollwatch",
-  "version": "1.0.2",
-  "author": "Desmond_lee",
+  "version": "1.7.6",
+  "author": "Desmond_lee, Dmitry Koulikoff",
   "license": "MIT",
   "private": false,
   "main": "dist/vue-scrollwatch.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Desdesdesgo/vue-scrollwatch.git"
+    "url": "https://github.com/dima4p/vue-scrollwatch.git"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot --config=webpack.config.dev.js",
